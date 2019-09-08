@@ -1,1 +1,1 @@
-web: java -jar target/TellMe-1.0-SNAPSHOT.jar
+web: java -jar target/Athlon-1.0-SNAPSHOT.jar
