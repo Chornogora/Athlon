@@ -12,6 +12,10 @@ public class TelegramController extends TelegramLongPollingBot {
 
     private Map<String, Command> commandMap;
 
+    private String botName;
+
+    private String botToken;
+
     @Override
     public void onUpdateReceived(Update update) {
         String messageText = update.getMessage().getText();
@@ -30,12 +34,12 @@ public class TelegramController extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "Athlon";
+        return botName;
     }
 
     @Override
     public String getBotToken() {
-        return "903971949:AAFF61XZzAJE4SYFIq7PnHY1WNR1KSy_EnY";
+        return botToken;
     }
 
     public void setCommandMap(Map<String, Command> map){
@@ -49,5 +53,13 @@ public class TelegramController extends TelegramLongPollingBot {
             return matcher.group(1);
         }
         return null;
+    }
+
+    public void setBotName(String botName) {
+        this.botName = botName;
+    }
+
+    public void setBotToken(String botToken) {
+        this.botToken = botToken;
     }
 }
