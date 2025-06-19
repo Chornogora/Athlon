@@ -15,7 +15,7 @@ public class ApplicationProperties {
     private Properties settings;
 
     @Autowired
-    private ApplicationProperties() throws IOException {
+    public void ApplicationProperties() throws IOException {
         settings = new Properties();
         settings.load(new FileReader(SETTINGS_FILEPATH));
     }

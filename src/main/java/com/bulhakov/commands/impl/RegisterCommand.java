@@ -27,7 +27,7 @@ public class RegisterCommand extends AbstractCommand {
 
         Message message = update.getMessage();
         User user = message.getFrom();
-        Integer userId = user.getId();
+        Long userId = user.getId();
         if(user.getUserName() == null){
             sendMessage = getAnswer(message,
                     localizationManager.getStringFromResource("NULL_NAME"));

@@ -2,9 +2,11 @@ package com.bulhakov.controller.telegram;
 
 import com.bulhakov.commands.Command;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,24 +14,28 @@ public class TelegramController extends TelegramLongPollingBot {
 
     private Map<String, Command> commandMap;
 
-    private String botName;
+    private final String botName;
 
-    private String botToken;
+    public TelegramController(String botToken, String botName) {
+        super(botToken);
+        this.botName = botName;
+    }
 
     @Override
     public void onUpdateReceived(Update update) {
         String messageText = update.getMessage().getText();
-        if(messageText == null) {
+        String commandRepresentation = (messageText == null)
+                ? getCaptionOrNull(update.getMessage())
+                : getCommandRepresentation(messageText);
+
+        if (commandRepresentation == null) {
+            System.out.println("No command found in the message");
             return;
         }
-        String commandRepresentation = getCommandRepresentation(messageText);
-        if(commandRepresentation == null){
-            return;
-        }
+
         Command command = commandMap.get(commandRepresentation);
-        if(command != null){
-            command.processUpdate(update, this);
-        }
+        Optional.of(command).ifPresentOrElse(cmd -> cmd.processUpdate(update, this),
+                () -> System.out.println("Command not found: " + commandRepresentation));
     }
 
     @Override
@@ -37,29 +43,24 @@ public class TelegramController extends TelegramLongPollingBot {
         return botName;
     }
 
-    @Override
-    public String getBotToken() {
-        return botToken;
-    }
-
-    public void setCommandMap(Map<String, Command> map){
+    public void setCommandMap(Map<String, Command> map) {
         this.commandMap = map;
     }
 
-    String getCommandRepresentation(String messageText){
+    private String getCaptionOrNull(Message message) {
+        if (message.getCaption() == null) {
+            return null;
+        }
+        String caption = message.getCaption();
+        return caption == null ? null : getCommandRepresentation(caption);
+    }
+
+    String getCommandRepresentation(String messageText) {
         Pattern pattern = Pattern.compile("^(/\\w*)[@ ]?");
         Matcher matcher = pattern.matcher(messageText);
-        if(matcher.find()){
+        if (matcher.find()) {
             return matcher.group(1);
         }
         return null;
-    }
-
-    public void setBotName(String botName) {
-        this.botName = botName;
-    }
-
-    public void setBotToken(String botToken) {
-        this.botToken = botToken;
     }
 }

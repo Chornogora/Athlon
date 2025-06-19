@@ -23,18 +23,22 @@ public class SayHelloCommand extends AbstractCommand {
 
     @Override
     public void processUpdate(Update update, TelegramLongPollingBot controller) {
+//        Message message = update.getMessage();
+//        User contact = message.getFrom();
+//
+//        com.bulhakov.model.User user = userService.findUser(String.valueOf(contact.getId()));
+//        if (user == null){
+//            SendMessage sendMessage = getAnswer(message, localizationManager.getStringFromResource("UNKNOWN_USER"));
+//            execute(controller, sendMessage);
+//            return;
+//        }
+//
+//        String author = contact.getFirstName();
+
         Message message = update.getMessage();
         User contact = message.getFrom();
-
-        com.bulhakov.model.User user = userService.findUser(String.valueOf(contact.getId()));
-        if(user == null){
-            SendMessage sendMessage = getAnswer(message, localizationManager.getStringFromResource("UNKNOWN_USER"));
-            execute(controller, sendMessage);
-            return;
-        }
-
-        String author = contact.getFirstName();
-        SendMessage sendMessage = getAnswer(message, localizationManager.getStringFromResource("HELLO") + author);
+        String answerText = localizationManager.getStringFromResource("HELLO") + ", " + contact.getUserName() + "!";
+        SendMessage sendMessage = getAnswer(message, answerText);
         execute(controller, sendMessage);
     }
 }

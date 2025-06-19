@@ -20,7 +20,7 @@ public class TelegramControllerTest {
 
     @Before
     public void setUp() {
-        controller = new TelegramController();
+        controller = new TelegramController("test", "test");
     }
 
     @Test

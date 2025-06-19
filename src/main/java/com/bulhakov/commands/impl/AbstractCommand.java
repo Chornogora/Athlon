@@ -16,7 +16,7 @@ public abstract class AbstractCommand implements Command {
 
     SendMessage getAnswer(Message message, String answerText){
         SendMessage s = new SendMessage();
-        s.enableMarkdown(true);
+        s.enableHtml(true);
         s.setChatId(message.getChatId().toString());
         s.setReplyToMessageId(message.getMessageId());
         s.setText(answerText);

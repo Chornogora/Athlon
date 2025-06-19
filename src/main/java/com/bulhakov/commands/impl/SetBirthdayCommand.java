@@ -45,7 +45,7 @@ public class SetBirthdayCommand extends AbstractCommand {
 
         String dateString = words[1];
 
-        int userId = update.getMessage().getFrom().getId();
+        long userId = update.getMessage().getFrom().getId();
         User user = userService.findUser(String.valueOf(userId));
         if (user == null) {
             answer = getAnswer(update.getMessage(),

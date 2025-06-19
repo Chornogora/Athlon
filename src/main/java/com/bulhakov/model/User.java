@@ -1,14 +1,11 @@
 package com.bulhakov.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.Date;
 
-@Document(collection = "users")
+//@Document(collection = "users")
 public class User {
 
-    @Id
+    //@Id
     private String id;
 
     private String login;
