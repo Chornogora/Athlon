@@ -28,8 +28,8 @@ public class InlineQueryHandler {
         List<InlineQueryResult> results = new ArrayList<>();
         Map<String, String> phrasesToShow = new HashMap<>();
 
-        String username = inlineQuery.getFrom().getUserName();
-        Map<String, String> phrases = fileRepository.getFilesForUser(username);
+        Long telegramUserId = inlineQuery.getFrom().getId();
+        Map<String, String> phrases = fileRepository.getFilesForUser(telegramUserId);
 
         for (String phrase : phrases.keySet()) {
             phrasesToShow.put(phrase, phrases.get(phrase));

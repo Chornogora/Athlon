@@ -5,24 +5,33 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class InMemoryFileRepository implements FileRepository {
 
-    private final Map<String, Map<String, String>> files = new HashMap<>();
+    //User id to filename to fileId mapping
+    private final Map<Long, Map<String, String>> files = new HashMap<>();
 
     @Override
-    public void storeFile(String username, String filename, String fileId) {
-        if (!files.containsKey(username)) {
-            files.put(username, new HashMap<>());
+    public void storeFile(Long externalUserId, String filename, String fileId) {
+        if (!files.containsKey(externalUserId)) {
+            files.put(externalUserId, new HashMap<>());
         }
 
-        Map<String, String> userFiles = files.get(username);
+        Map<String, String> userFiles = files.get(externalUserId);
         userFiles.put(filename, fileId);
     }
 
     @Override
-    public Map<String, String> getFilesForUser(String username) {
-        return files.getOrDefault(username, new HashMap<>());
+    public Map<String, String> getFilesForUser(Long externalUserId) {
+        return files.getOrDefault(externalUserId, new HashMap<>());
     }
+
+    @Override
+    public Optional<String> getFileForUser(Long externalUserId, String filename) {
+        Map<String, String> userFiles = files.getOrDefault(externalUserId, new HashMap<>());
+        return Optional.ofNullable(userFiles.get(filename));
+    }
+
 }

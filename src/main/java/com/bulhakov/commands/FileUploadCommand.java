@@ -10,15 +10,18 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.bulhakov.commands.FileUploadCommand.COMMAND_NAME;
+
 @Component
-@CommandMapping(name = "/upload")
+@CommandMapping(name = COMMAND_NAME)
 public class FileUploadCommand extends AbstractCommand {
+
+    public static final String COMMAND_NAME = "/upload";
 
     private final FileRepository fileRepository;
 
@@ -33,17 +36,37 @@ public class FileUploadCommand extends AbstractCommand {
 
         Optional<String> fileIdOptional = tryExtractingFileId(message);
         fileIdOptional.ifPresentOrElse(fileId -> {
-            GetFile getFile = new GetFile();
-            getFile.setFileId(fileId);
 
-            User contact = message.getFrom();
-            fileRepository.storeFile(contact.getUserName(), UUID.randomUUID().toString(), fileId);
+            Long telegramUserId = message.getFrom().getId();
+            String filename = getFileName(message, telegramUserId);
+            fileRepository.storeFile(telegramUserId, filename, fileId);
+
+            //GetFile getFile = new GetFile();
+            //getFile.setFileId(fileId);
             //tryDownloadFile(controller, message, getFile);
         }, () -> {
             String errorText = localizationManager.getStringFromResource("FILE_UPLOAD_ERROR");
             SendMessage sendMessage = getAnswer(message, errorText);
             execute(controller, sendMessage);
         });
+    }
+
+    private String getFileName(Message message, Long telegramUserId) {
+        String messageContent = message.getCaption().substring(COMMAND_NAME.length()).stripLeading();
+        if (!messageContent.isEmpty()) {
+            return messageContent;
+        }
+
+        // Generate a unique file name based on a random UUID
+        String generatedId = null;
+        while (generatedId == null) {
+            String randomId = UUID.randomUUID().toString();
+            String randomIdShort = randomId.substring(0, randomId.indexOf("-"));
+            if (fileRepository.getFileForUser(telegramUserId, randomIdShort).isEmpty()) {
+                generatedId = randomIdShort;
+            }
+        }
+        return generatedId;
     }
 
     private Optional<String> tryExtractingFileId(Message message) {
@@ -54,7 +77,7 @@ public class FileUploadCommand extends AbstractCommand {
             return Optional.ofNullable(message.getDocument().getFileId());
         } else if (message.hasVoice()) {
             return Optional.ofNullable(message.getVoice().getFileId());
-        }else {
+        } else {
             return Optional.empty();
         }
     }
