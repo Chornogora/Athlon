@@ -2,8 +2,10 @@ package com.bulhakov.controller.telegram;
 
 import com.bulhakov.commands.Command;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,13 +18,32 @@ public class TelegramController extends TelegramLongPollingBot {
 
     private final String botName;
 
-    public TelegramController(String botToken, String botName) {
+    private final InlineQueryHandler inlineQueryHandler;
+
+    public TelegramController(String botToken, String botName, InlineQueryHandler inlineQueryHandler) {
         super(botToken);
         this.botName = botName;
+        this.inlineQueryHandler = inlineQueryHandler;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
+        try {
+            if (update.hasMessage()) {
+                System.out.println("Handling message update");
+                handleMessage(update);
+            } else if (update.hasInlineQuery()) {
+                System.out.println("Handling inline query update");
+                AnswerInlineQuery answer = inlineQueryHandler.handleInlineQuery(update.getInlineQuery());
+                execute(answer);
+            }
+        } catch (TelegramApiException e) {
+            System.err.println("Error processing update: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleMessage(Update update) {
         String messageText = update.getMessage().getText();
         String commandRepresentation = (messageText == null)
                 ? getCaptionOrNull(update.getMessage())

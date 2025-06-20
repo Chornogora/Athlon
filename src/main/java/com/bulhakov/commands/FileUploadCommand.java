@@ -1,6 +1,8 @@
-package com.bulhakov.commands.impl;
+package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
+import com.bulhakov.repository.interfaces.FileRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
@@ -8,13 +10,22 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @CommandMapping(name = "/upload")
 public class FileUploadCommand extends AbstractCommand {
+
+    private final FileRepository fileRepository;
+
+    @Autowired
+    public FileUploadCommand(FileRepository fileRepository) {
+        this.fileRepository = fileRepository;
+    }
 
     @Override
     public void processUpdate(Update update, TelegramLongPollingBot controller) {
@@ -24,7 +35,10 @@ public class FileUploadCommand extends AbstractCommand {
         fileIdOptional.ifPresentOrElse(fileId -> {
             GetFile getFile = new GetFile();
             getFile.setFileId(fileId);
-            tryDownloadFile(controller, message, getFile);
+
+            User contact = message.getFrom();
+            fileRepository.storeFile(contact.getUserName(), UUID.randomUUID().toString(), fileId);
+            //tryDownloadFile(controller, message, getFile);
         }, () -> {
             String errorText = localizationManager.getStringFromResource("FILE_UPLOAD_ERROR");
             SendMessage sendMessage = getAnswer(message, errorText);

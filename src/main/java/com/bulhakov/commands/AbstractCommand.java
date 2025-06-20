@@ -1,6 +1,5 @@
-package com.bulhakov.commands.impl;
+package com.bulhakov.commands;
 
-import com.bulhakov.commands.Command;
 import com.bulhakov.services.UserService;
 import com.bulhakov.util.LocalizationManager;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;

@@ -1,4 +1,4 @@
-package com.bulhakov.repository;
+package com.bulhakov.repository.interfaces;
 
 import com.bulhakov.model.User;
 

@@ -1,6 +1,7 @@
 package com.bulhakov.repository;
 
 import com.bulhakov.model.User;
+import com.bulhakov.repository.interfaces.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

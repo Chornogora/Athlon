@@ -1,4 +1,4 @@
-package com.bulhakov.commands.impl;
+package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.services.UserService;

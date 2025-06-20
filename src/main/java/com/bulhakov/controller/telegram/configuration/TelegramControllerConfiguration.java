@@ -2,11 +2,12 @@ package com.bulhakov.controller.telegram.configuration;
 
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.commands.Command;
-import com.bulhakov.commands.impl.FileUploadCommand;
-import com.bulhakov.commands.impl.RegisterCommand;
-import com.bulhakov.commands.impl.SayHelloCommand;
-import com.bulhakov.commands.impl.SetBirthdayCommand;
-import com.bulhakov.commands.impl.SetLocaleCommand;
+import com.bulhakov.commands.FileUploadCommand;
+import com.bulhakov.commands.RegisterCommand;
+import com.bulhakov.commands.SayHelloCommand;
+import com.bulhakov.commands.SetBirthdayCommand;
+import com.bulhakov.commands.SetLocaleCommand;
+import com.bulhakov.controller.telegram.InlineQueryHandler;
 import com.bulhakov.controller.telegram.TelegramController;
 import com.bulhakov.util.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +50,11 @@ public class TelegramControllerConfiguration {
     }
 
     @Autowired
-    private void initBot(){
+    private void initBot(InlineQueryHandler inlineQueryHandler){
         TelegramController controller = new TelegramController(
                 applicationProperties.getProperty("botToken"),
-                applicationProperties.getProperty("botName"));
+                applicationProperties.getProperty("botName"),
+                inlineQueryHandler);
         controller.setCommandMap(commandMap());
 
         try{
