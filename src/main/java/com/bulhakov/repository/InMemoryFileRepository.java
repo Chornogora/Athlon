@@ -34,4 +34,18 @@ public class InMemoryFileRepository implements FileRepository {
         return Optional.ofNullable(userFiles.get(filename));
     }
 
+    @Override
+    public void renameFile(Long telegramUserId, String existingFileName, String filename) {
+        Map<String, String> userFiles = files.get(telegramUserId);
+        if (userFiles != null) {
+            if (userFiles.containsKey(existingFileName)) {
+                String fileId = userFiles.remove(existingFileName);
+                userFiles.put(filename, fileId);
+            } else {
+                throw new IllegalArgumentException("File with name " + existingFileName + " does not exist for user with id: " + telegramUserId);
+            }
+        } else {
+            throw new IllegalArgumentException("No files found for user with id: " + telegramUserId);
+        }
+    }
 }

@@ -11,11 +11,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @CommandMapping(name = "/locale")
-public class SetLocaleCommand extends AbstractCommand{
+public class SetLocaleCommand extends AbstractCommand {
 
     @Autowired
     public SetLocaleCommand(LocalizationManager localizationManager) {
-        this.localizationManager = localizationManager;
+        super(localizationManager);
     }
 
     @Override
@@ -24,13 +24,13 @@ public class SetLocaleCommand extends AbstractCommand{
         String[] words = message.getText().split(" ");
 
         SendMessage sendMessage;
-        if(words.length == 1){
+        if (words.length == 1) {
             sendMessage = getAnswer(message, localizationManager.getStringFromResource("LOCALES"));
-        }else{
-            try{
+        } else {
+            try {
                 localizationManager.setResource(words[1]);
                 sendMessage = getAnswer(message, localizationManager.getStringFromResource("SUCCESS_LOCALIZATION"));
-            }catch(IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 sendMessage = getAnswer(message, localizationManager.getStringFromResource("FAILED_LOCALIZATION"));
             }
         }

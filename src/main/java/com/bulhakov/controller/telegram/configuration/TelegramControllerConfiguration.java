@@ -2,6 +2,7 @@ package com.bulhakov.controller.telegram.configuration;
 
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.commands.Command;
+import com.bulhakov.commands.FileRenameCommand;
 import com.bulhakov.commands.FileUploadCommand;
 import com.bulhakov.commands.RegisterCommand;
 import com.bulhakov.commands.SayHelloCommand;
@@ -32,6 +33,8 @@ public class TelegramControllerConfiguration {
 
     private final FileUploadCommand fileUploadCommand;
 
+    private final FileRenameCommand fileRenameCommand;
+
     private final ApplicationProperties applicationProperties;
 
     @Autowired
@@ -40,42 +43,45 @@ public class TelegramControllerConfiguration {
                                            RegisterCommand registerCommand,
                                            SetBirthdayCommand birthdayCommand,
                                            FileUploadCommand fileUploadCommand,
+                                           FileRenameCommand fileRenameCommand,
                                            ApplicationProperties applicationProperties) {
         this.helloCommand = command;
         this.localeCommand = localeCommand;
         this.registerCommand = registerCommand;
         this.birthdayCommand = birthdayCommand;
         this.fileUploadCommand = fileUploadCommand;
+        this.fileRenameCommand = fileRenameCommand;
         this.applicationProperties = applicationProperties;
     }
 
     @Autowired
-    private void initBot(InlineQueryHandler inlineQueryHandler){
+    private void initBot(InlineQueryHandler inlineQueryHandler) {
         TelegramController controller = new TelegramController(
                 applicationProperties.getProperty("botToken"),
                 applicationProperties.getProperty("botName"),
                 inlineQueryHandler);
         controller.setCommandMap(commandMap());
 
-        try{
+        try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(controller);
-        }catch(TelegramApiException e){
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
 
-    public Map<String, Command> commandMap(){
-        Map<String, Command> commandMap =  new HashMap<>();
+    public Map<String, Command> commandMap() {
+        Map<String, Command> commandMap = new HashMap<>();
         commandMap.put(getCommandStringRepresentation(helloCommand), helloCommand);
         commandMap.put(getCommandStringRepresentation(localeCommand), localeCommand);
         commandMap.put(getCommandStringRepresentation(registerCommand), registerCommand);
         commandMap.put(getCommandStringRepresentation(birthdayCommand), birthdayCommand);
         commandMap.put(getCommandStringRepresentation(fileUploadCommand), fileUploadCommand);
+        commandMap.put(getCommandStringRepresentation(fileRenameCommand), fileRenameCommand);
         return commandMap;
     }
 
-    private String getCommandStringRepresentation(Command command){
+    private String getCommandStringRepresentation(Command command) {
         Class<? extends Command> cls = command.getClass();
         CommandMapping annotation = cls.getAnnotation(CommandMapping.class);
         return annotation.name();

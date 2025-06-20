@@ -2,6 +2,7 @@ package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.repository.interfaces.FileRepository;
+import com.bulhakov.util.LocalizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -26,7 +27,8 @@ public class FileUploadCommand extends AbstractCommand {
     private final FileRepository fileRepository;
 
     @Autowired
-    public FileUploadCommand(FileRepository fileRepository) {
+    public FileUploadCommand(LocalizationManager localizationManager, FileRepository fileRepository) {
+        super(localizationManager);
         this.fileRepository = fileRepository;
     }
 

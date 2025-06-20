@@ -17,7 +17,7 @@ public class SayHelloCommand extends AbstractCommand {
 
     @Autowired
     public SayHelloCommand(LocalizationManager localizationManager, UserService service) {
-        this.localizationManager = localizationManager;
+        super(localizationManager);
         this.userService = service;
     }
 

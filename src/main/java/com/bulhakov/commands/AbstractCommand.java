@@ -11,7 +11,11 @@ public abstract class AbstractCommand implements Command {
 
     UserService userService;
 
-    LocalizationManager localizationManager;
+    protected LocalizationManager localizationManager;
+
+    protected AbstractCommand(LocalizationManager localizationManager) {
+        this.localizationManager = localizationManager;
+    }
 
     SendMessage getAnswer(Message message, String answerText){
         SendMessage s = new SendMessage();

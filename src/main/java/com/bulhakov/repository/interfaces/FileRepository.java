@@ -10,4 +10,6 @@ public interface FileRepository {
     Map<String, String> getFilesForUser(Long externalUserId);
 
     Optional<String> getFileForUser(Long externalUserId, String filename);
+
+    void renameFile(Long telegramUserId, String existingFileName, String filename);
 }

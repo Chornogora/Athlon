@@ -17,7 +17,7 @@ public class RegisterCommand extends AbstractCommand {
 
     @Autowired
     private RegisterCommand(LocalizationManager localizationManager, UserService userService){
-        this.localizationManager = localizationManager;
+        super(localizationManager);
         this.userService = userService;
     }
 

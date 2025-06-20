@@ -22,13 +22,15 @@ public class SetBirthdayCommand extends AbstractCommand {
     private static final String DATE_STRING_FORMAT = "dd.mm.yyyy";
 
     private final SimpleDateFormat dateFormat;
+    private final LocalizationManager localizationManager;
 
     @Autowired
-    public SetBirthdayCommand(LocalizationManager manager, UserService service) {
-        this.localizationManager = manager;
+    public SetBirthdayCommand(LocalizationManager localizationManager, UserService service) {
+        super(localizationManager);
         this.userService = service;
         dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
         dateFormat.setLenient(false);
+        this.localizationManager = localizationManager;
     }
 
     @Override
