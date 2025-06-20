@@ -1,1 +1,0 @@
-web: java -jar target/Athlon-1.0-SNAPSHOT.jar
