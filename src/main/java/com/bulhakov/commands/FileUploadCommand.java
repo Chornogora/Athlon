@@ -3,6 +3,7 @@ package com.bulhakov.commands;
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.repository.interfaces.FileRepository;
 import com.bulhakov.util.LocalizationManager;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -40,8 +41,12 @@ public class FileUploadCommand extends AbstractCommand {
         fileIdOptional.ifPresentOrElse(fileId -> {
 
             Long telegramUserId = message.getFrom().getId();
-            String filename = getFileName(message, telegramUserId);
-            fileRepository.storeFile(telegramUserId, filename, fileId);
+            Pair<String, Boolean> filenameGenerationResult = getFileName(message, telegramUserId);
+            fileRepository.storeFile(telegramUserId, filenameGenerationResult.getLeft(), fileId);
+
+            String successText = getFileUploadedText(filenameGenerationResult.getLeft(), filenameGenerationResult.getRight());
+            SendMessage sendMessage = getAnswer(message, successText);
+            execute(controller, sendMessage);
 
             //GetFile getFile = new GetFile();
             //getFile.setFileId(fileId);
@@ -53,10 +58,10 @@ public class FileUploadCommand extends AbstractCommand {
         });
     }
 
-    private String getFileName(Message message, Long telegramUserId) {
+    private Pair<String, Boolean> getFileName(Message message, Long telegramUserId) {
         String messageContent = message.getCaption().substring(COMMAND_NAME.length()).stripLeading();
         if (!messageContent.isEmpty()) {
-            return messageContent;
+            return Pair.of(messageContent, true);
         }
 
         // Generate a unique file name based on a random UUID
@@ -68,7 +73,14 @@ public class FileUploadCommand extends AbstractCommand {
                 generatedId = randomIdShort;
             }
         }
-        return generatedId;
+        return Pair.of(generatedId, false);
+    }
+
+    private String getFileUploadedText(String fileName, boolean isCustomName) {
+        String basicMessage = localizationManager.getStringFromResource("FILE_UPLOAD_SUCCESS");
+        return (isCustomName)
+                ? "%s. File name: %s".formatted(basicMessage, fileName)
+                : "%s. File name: %s. You can change it using the /rename command".formatted(basicMessage, fileName);
     }
 
     private Optional<String> tryExtractingFileId(Message message) {

@@ -1,4 +1,4 @@
-package com.bulhakov.util.configuration;
+package com.bulhakov.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
