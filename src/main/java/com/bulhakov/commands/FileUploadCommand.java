@@ -41,7 +41,15 @@ public class FileUploadCommand extends AbstractCommand {
         fileIdOptional.ifPresentOrElse(fileId -> {
 
             Long telegramUserId = message.getFrom().getId();
-            Pair<String, Boolean> filenameGenerationResult = getFileName(message, telegramUserId);
+            Pair<String, Boolean> filenameGenerationResult;
+            
+            try {
+                filenameGenerationResult = getFileName(message, telegramUserId);
+            } catch (IllegalArgumentException e) {
+                SendMessage sendMessage = getAnswer(message, e.getMessage());
+                execute(controller, sendMessage);
+                return;
+            }
             fileRepository.storeFile(telegramUserId, filenameGenerationResult.getLeft(), fileId);
 
             String successText = getFileUploadedText(filenameGenerationResult.getLeft(), filenameGenerationResult.getRight());
@@ -61,6 +69,9 @@ public class FileUploadCommand extends AbstractCommand {
     private Pair<String, Boolean> getFileName(Message message, Long telegramUserId) {
         String messageContent = message.getCaption().substring(COMMAND_NAME.length()).stripLeading();
         if (!messageContent.isEmpty()) {
+            if (fileRepository.getFileForUser(telegramUserId, messageContent).isPresent()) {
+                throw new IllegalArgumentException(localizationManager.getStringFromResource("FILE_NAME_EXISTS"));
+            }
             return Pair.of(messageContent, true);
         }
 

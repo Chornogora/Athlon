@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultVoice;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -26,20 +25,15 @@ public class InlineQueryHandler {
 
     public AnswerInlineQuery handleInlineQuery(InlineQuery inlineQuery) {
         List<InlineQueryResult> results = new ArrayList<>();
-        Map<String, String> phrasesToShow = new HashMap<>();
 
         Long telegramUserId = inlineQuery.getFrom().getId();
         Map<String, String> phrases = fileRepository.getFilesForUser(telegramUserId);
 
         for (String phrase : phrases.keySet()) {
-            phrasesToShow.put(phrase, phrases.get(phrase));
-        }
-
-        for (String phrase : phrasesToShow.keySet()) {
             InlineQueryResultVoice voiceResult = new InlineQueryResultVoice();
             voiceResult.setId(UUID.randomUUID().toString()); // Generate a unique ID for each result
             voiceResult.setTitle(phrase);
-            voiceResult.setVoiceUrl(phrasesToShow.get(phrase)); // This must be a direct URL to the voice file
+            voiceResult.setVoiceUrl(phrases.get(phrase)); // This must be a direct URL to the voice file
             // You might also want to set an inputMessageContent if clicking the voice should send a text message
             // voiceResult.setInputMessageContent(new InputTextMessageContent("Playing " + phrase.get("name")));
             results.add(voiceResult);

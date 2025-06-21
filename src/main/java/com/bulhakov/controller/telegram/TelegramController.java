@@ -55,7 +55,7 @@ public class TelegramController extends TelegramLongPollingBot {
         }
 
         Command command = commandMap.get(commandRepresentation);
-        Optional.of(command).ifPresentOrElse(cmd -> cmd.processUpdate(update, this),
+        Optional.ofNullable(command).ifPresentOrElse(cmd -> cmd.processUpdate(update, this),
                 () -> System.out.println("Command not found: " + commandRepresentation));
     }
 

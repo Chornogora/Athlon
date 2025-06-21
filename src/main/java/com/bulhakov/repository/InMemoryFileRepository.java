@@ -48,4 +48,18 @@ public class InMemoryFileRepository implements FileRepository {
             throw new IllegalArgumentException("No files found for user with id: " + telegramUserId);
         }
     }
+
+    @Override
+    public void deleteFile(Long telegramUserId, String filename) {
+        Map<String, String> userFiles = files.get(telegramUserId);
+        if (userFiles != null) {
+            if (userFiles.containsKey(filename)) {
+                userFiles.remove(filename);
+            } else {
+                throw new IllegalArgumentException("File with name " + filename + " does not exist for user with id: " + telegramUserId);
+            }
+        } else {
+            throw new IllegalArgumentException("No files found for user with id: " + telegramUserId);
+        }
+    }
 }

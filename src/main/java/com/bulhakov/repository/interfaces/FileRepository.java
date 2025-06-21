@@ -12,4 +12,6 @@ public interface FileRepository {
     Optional<String> getFileForUser(Long externalUserId, String filename);
 
     void renameFile(Long telegramUserId, String existingFileName, String filename);
+
+    void deleteFile(Long telegramUserId, String filename);
 }

@@ -44,11 +44,23 @@ public class FileRenameCommand extends AbstractCommand {
             execute(controller, sendMessage);
             return;
         }
-
         Long telegramUserId = message.getFrom().getId();
 
+        tryRenameFile(controller, telegramUserId, filenames, message);
+    }
+
+    private void tryRenameFile(TelegramLongPollingBot controller, Long telegramUserId, Pair<String, String> filenames, Message message) {
         Optional<String> file = fileRepository.getFileForUser(telegramUserId, filenames.getLeft());
         file.ifPresentOrElse(existingFileName -> {
+
+            if (fileRepository.getFileForUser(telegramUserId, filenames.getRight()).isPresent()) {
+                String errorText = localizationManager.getStringFromResource("FILE_RENAME_ALREADY_EXISTS")
+                        + ": " + filenames.getRight();
+                SendMessage sendMessage = getAnswer(message, errorText);
+                execute(controller, sendMessage);
+                return;
+            }
+
             fileRepository.renameFile(telegramUserId, filenames.getLeft(), filenames.getRight());
             String successText = localizationManager.getStringFromResource("FILE_RENAME_SUCCESS");
             SendMessage sendMessage = getAnswer(message, successText);
