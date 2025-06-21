@@ -1,0 +1,6 @@
+server:
+    port: 5000
+
+telegram-bot:
+    bot-name: 'Athlon'
+    bot-token: '<push your bot token here>'
