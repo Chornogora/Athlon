@@ -26,9 +26,9 @@ public abstract class AbstractCommand implements Command {
         return s;
     }
 
-    void execute(TelegramLongPollingBot controller, SendMessage message){
+    void execute(TelegramLongPollingBot bot, SendMessage message){
         try {
-            controller.execute(message);
+            bot.execute(message);
         }catch(TelegramApiException e){
             e.printStackTrace();
         }

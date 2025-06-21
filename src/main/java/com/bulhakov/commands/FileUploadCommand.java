@@ -34,7 +34,7 @@ public class FileUploadCommand extends AbstractCommand {
     }
 
     @Override
-    public void processUpdate(Update update, TelegramLongPollingBot controller) {
+    public void processUpdate(Update update, TelegramLongPollingBot bot) {
         Message message = update.getMessage();
 
         Optional<String> fileIdOptional = tryExtractingFileId(message);
@@ -42,27 +42,27 @@ public class FileUploadCommand extends AbstractCommand {
 
             Long telegramUserId = message.getFrom().getId();
             Pair<String, Boolean> filenameGenerationResult;
-            
+
             try {
                 filenameGenerationResult = getFileName(message, telegramUserId);
             } catch (IllegalArgumentException e) {
                 SendMessage sendMessage = getAnswer(message, e.getMessage());
-                execute(controller, sendMessage);
+                execute(bot, sendMessage);
                 return;
             }
             fileRepository.storeFile(telegramUserId, filenameGenerationResult.getLeft(), fileId);
 
             String successText = getFileUploadedText(filenameGenerationResult.getLeft(), filenameGenerationResult.getRight());
             SendMessage sendMessage = getAnswer(message, successText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
 
             //GetFile getFile = new GetFile();
             //getFile.setFileId(fileId);
-            //tryDownloadFile(controller, message, getFile);
+            //tryDownloadFile(bot, message, getFile);
         }, () -> {
             String errorText = localizationManager.getStringFromResource("FILE_UPLOAD_ERROR");
             SendMessage sendMessage = getAnswer(message, errorText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
         });
     }
 

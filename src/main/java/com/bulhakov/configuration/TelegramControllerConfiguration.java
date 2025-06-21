@@ -3,7 +3,7 @@ package com.bulhakov.configuration;
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.commands.Command;
 import com.bulhakov.controller.telegram.InlineQueryHandler;
-import com.bulhakov.controller.telegram.TelegramController;
+import com.bulhakov.controller.telegram.AthlonBot;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -38,21 +38,21 @@ public class TelegramControllerConfiguration {
     }
 
     @Bean
-    public TelegramController telegramController(InlineQueryHandler inlineQueryHandler,
-                                                 @Qualifier("commandsByTelegramBotCommand")
+    public AthlonBot telegramController(InlineQueryHandler inlineQueryHandler,
+                                        @Qualifier("commandsByTelegramBotCommand")
                                                  Map<String, Command> commandsMap) {
-        TelegramController controller = new TelegramController(botToken, botName, inlineQueryHandler);
-        controller.setCommandMap(commandsMap);
+        AthlonBot bot = new AthlonBot(botToken, botName, inlineQueryHandler);
+        bot.setCommandMap(commandsMap);
 
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramBotsApi.registerBot(controller);
+            telegramBotsApi.registerBot(bot);
         } catch (TelegramApiException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to register Telegram bot", e);
         }
 
-        return controller;
+        return bot;
     }
 
     private String getCommandStringRepresentation(Command command) {

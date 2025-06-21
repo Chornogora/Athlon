@@ -22,7 +22,7 @@ public class RegisterCommand extends AbstractCommand {
     }
 
     @Override
-    public void processUpdate(Update update, TelegramLongPollingBot controller) {
+    public void processUpdate(Update update, TelegramLongPollingBot bot) {
         SendMessage sendMessage;
 
         Message message = update.getMessage();
@@ -31,7 +31,7 @@ public class RegisterCommand extends AbstractCommand {
         if(user.getUserName() == null){
             sendMessage = getAnswer(message,
                     localizationManager.getStringFromResource("NULL_NAME"));
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
             return;
         }
 
@@ -46,6 +46,6 @@ public class RegisterCommand extends AbstractCommand {
             sendMessage = getAnswer(message,
                     localizationManager.getStringFromResource("ALREADY_KNOW") + dbUser.getName());
         }
-        execute(controller, sendMessage);
+        execute(bot, sendMessage);
     }
 }

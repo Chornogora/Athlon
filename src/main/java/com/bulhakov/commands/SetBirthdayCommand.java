@@ -34,14 +34,14 @@ public class SetBirthdayCommand extends AbstractCommand {
     }
 
     @Override
-    public void processUpdate(Update update, TelegramLongPollingBot controller) {
+    public void processUpdate(Update update, TelegramLongPollingBot bot) {
         String messageText = update.getMessage().getText();
         String[] words = messageText.split(" ");
         SendMessage answer;
         if (words.length == 1) {
             answer = getAnswer(update.getMessage(),
                     localizationManager.getStringFromResource("BIRTHDAY_INFO"));
-            execute(controller, answer);
+            execute(bot, answer);
             return;
         }
 
@@ -52,7 +52,7 @@ public class SetBirthdayCommand extends AbstractCommand {
         if (user == null) {
             answer = getAnswer(update.getMessage(),
                     localizationManager.getStringFromResource("UNKNOWN_USER"));
-            execute(controller, answer);
+            execute(bot, answer);
             return;
         }
 
@@ -61,11 +61,11 @@ public class SetBirthdayCommand extends AbstractCommand {
             userService.updateUser(user);
             answer = getAnswer(update.getMessage(),
                     localizationManager.getStringFromResource("BIRTHDAY_ACCEPTED"));
-            execute(controller, answer);
+            execute(bot, answer);
         } catch (ParseException e) {
             answer = getAnswer(update.getMessage(),
                     localizationManager.getStringFromResource("INVALID_DATE_FORMAT"));
-            execute(controller, answer);
+            execute(bot, answer);
             e.printStackTrace();
         } catch (WrongDateException e) {
             String description = null;
@@ -76,7 +76,7 @@ public class SetBirthdayCommand extends AbstractCommand {
                 description = localizationManager.getStringFromResource("FUTURE_DATE");
             }
             answer = getAnswer(update.getMessage(), description);
-            execute(controller, answer);
+            execute(bot, answer);
         }
     }
 

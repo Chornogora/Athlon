@@ -32,7 +32,7 @@ public class FileRenameCommand extends AbstractCommand {
     }
 
     @Override
-    public void processUpdate(Update update, TelegramLongPollingBot controller) {
+    public void processUpdate(Update update, TelegramLongPollingBot bot) {
         // pair oldFilename - newFilename
         Message message = update.getMessage();
         Pair<String, String> filenames;
@@ -41,15 +41,15 @@ public class FileRenameCommand extends AbstractCommand {
         } catch (IllegalArgumentException e) {
             String errorText = localizationManager.getStringFromResource("FILE_RENAME_INVALID_COMMAND");
             SendMessage sendMessage = getAnswer(message, errorText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
             return;
         }
         Long telegramUserId = message.getFrom().getId();
 
-        tryRenameFile(controller, telegramUserId, filenames, message);
+        tryRenameFile(bot, telegramUserId, filenames, message);
     }
 
-    private void tryRenameFile(TelegramLongPollingBot controller, Long telegramUserId, Pair<String, String> filenames, Message message) {
+    private void tryRenameFile(TelegramLongPollingBot bot, Long telegramUserId, Pair<String, String> filenames, Message message) {
         Optional<String> file = fileRepository.getFileForUser(telegramUserId, filenames.getLeft());
         file.ifPresentOrElse(existingFileName -> {
 
@@ -57,19 +57,19 @@ public class FileRenameCommand extends AbstractCommand {
                 String errorText = localizationManager.getStringFromResource("FILE_RENAME_ALREADY_EXISTS")
                         + ": " + filenames.getRight();
                 SendMessage sendMessage = getAnswer(message, errorText);
-                execute(controller, sendMessage);
+                execute(bot, sendMessage);
                 return;
             }
 
             fileRepository.renameFile(telegramUserId, filenames.getLeft(), filenames.getRight());
             String successText = localizationManager.getStringFromResource("FILE_RENAME_SUCCESS");
             SendMessage sendMessage = getAnswer(message, successText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
         }, () -> {
             String errorText = localizationManager.getStringFromResource("FILE_RENAME_NOT_FOUND")
                     + ": " + filenames.getLeft();
             SendMessage sendMessage = getAnswer(message, errorText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
         });
     }
 

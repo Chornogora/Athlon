@@ -19,7 +19,7 @@ public class SetLocaleCommand extends AbstractCommand {
     }
 
     @Override
-    public void processUpdate(Update update, TelegramLongPollingBot controller) {
+    public void processUpdate(Update update, TelegramLongPollingBot bot) {
         Message message = update.getMessage();
         String[] words = message.getText().split(" ");
 
@@ -34,6 +34,6 @@ public class SetLocaleCommand extends AbstractCommand {
                 sendMessage = getAnswer(message, localizationManager.getStringFromResource("FAILED_LOCALIZATION"));
             }
         }
-        execute(controller, sendMessage);
+        execute(bot, sendMessage);
     }
 }

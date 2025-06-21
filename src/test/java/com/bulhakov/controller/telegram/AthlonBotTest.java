@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class TelegramControllerTest {
+public class AthlonBotTest {
 
     private static final String[] validCommands = {
             "/hello@bot",
@@ -16,11 +16,11 @@ public class TelegramControllerTest {
 
     private static final String invalidCommand = "Not a command";
 
-    private TelegramController controller;
+    private AthlonBot controller;
 
     @Before
     public void setUp() {
-        controller = new TelegramController("test", "test", null);
+        controller = new AthlonBot("test", "test", null);
     }
 
     @Test

@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TelegramController extends TelegramLongPollingBot {
+public class AthlonBot extends TelegramLongPollingBot {
 
     private Map<String, Command> commandMap;
 
@@ -20,7 +20,7 @@ public class TelegramController extends TelegramLongPollingBot {
 
     private final InlineQueryHandler inlineQueryHandler;
 
-    public TelegramController(String botToken, String botName, InlineQueryHandler inlineQueryHandler) {
+    public AthlonBot(String botToken, String botName, InlineQueryHandler inlineQueryHandler) {
         super(botToken);
         this.botName = botName;
         this.inlineQueryHandler = inlineQueryHandler;

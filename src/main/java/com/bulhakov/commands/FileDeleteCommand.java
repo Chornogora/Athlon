@@ -29,7 +29,7 @@ public class FileDeleteCommand extends AbstractCommand {
     }
 
     @Override
-    public void processUpdate(Update update, TelegramLongPollingBot controller) {
+    public void processUpdate(Update update, TelegramLongPollingBot bot) {
         Message message = update.getMessage();
         String filename;
         String messageContent = message.getText().substring(COMMAND_NAME.length()).trim();
@@ -38,7 +38,7 @@ public class FileDeleteCommand extends AbstractCommand {
         } else {
             String errorText = localizationManager.getStringFromResource("FILE_DELETE_INVALID_COMMAND");
             SendMessage sendMessage = getAnswer(message, errorText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
             return;
         }
 
@@ -49,12 +49,12 @@ public class FileDeleteCommand extends AbstractCommand {
             fileRepository.deleteFile(telegramUserId, filename);
             String successText = localizationManager.getStringFromResource("FILE_DELETE_SUCCESS");
             SendMessage sendMessage = getAnswer(message, successText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
         }, () -> {
             String errorText = localizationManager.getStringFromResource("FILE_DELETE_NOT_FOUND")
                     + ": " + filename;
             SendMessage sendMessage = getAnswer(message, errorText);
-            execute(controller, sendMessage);
+            execute(bot, sendMessage);
         });
     }
 }
