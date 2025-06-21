@@ -60,9 +60,8 @@ public class SetBirthdayCommand extends AbstractCommand {
 
         try {
             Date birthday = getBirthdayDate(dateString);
-            User updatedUser = new User(user.id(), user.externalId(), user.login(), user.username(),
-                    birthday, user.banned());
-            userService.updateUser(updatedUser);
+            user.setBirthday(birthday);
+            userService.updateUser(user);
             answer = getAnswer(update.getMessage(),
                     localizationManager.getStringFromResource("BIRTHDAY_ACCEPTED"));
             execute(bot, answer);
@@ -76,7 +75,7 @@ public class SetBirthdayCommand extends AbstractCommand {
             WrongDateException.CAUSE cause = e.getDateExceptionCause();
             if (cause == WrongDateException.CAUSE.LATE) {
                 description = localizationManager.getStringFromResource("LATE_DATE");
-            }else if(cause == WrongDateException.CAUSE.FUTURE) {
+            } else if (cause == WrongDateException.CAUSE.FUTURE) {
                 description = localizationManager.getStringFromResource("FUTURE_DATE");
             }
             answer = getAnswer(update.getMessage(), description);

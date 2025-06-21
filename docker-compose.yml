@@ -1,0 +1,18 @@
+services:
+  athlon-db:
+    image: postgres
+    restart: always
+    shm_size: 512mb
+    environment:
+      POSTGRES_PASSWORD: athlon_pass
+      POSTGRES_USER: athlon
+      POSTGRES_DB: athlon
+    ports:
+      - 5432:5432
+    volumes:
+      - athlon-db-data:/var/lib/postgresql/data
+      - ./src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  athlon-db-data:
+    driver: local

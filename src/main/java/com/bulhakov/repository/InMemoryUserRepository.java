@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
@@ -21,11 +20,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        if (user.id() == null) {
-            String id = UUID.randomUUID().toString();
-            user = new User(id, user.externalId(), user.login(), user.username(), user.birthday(), user.banned());
-        }
-        users.put(user.id(), user);
+        users.put(user.getId(), user);
         return user;
     }
 
@@ -37,7 +32,7 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public Optional<User> findByExternalId(Long id) {
         return users.values().stream()
-                .filter(user -> user.externalId().equals(id))
+                .filter(user -> user.getExternalId().equals(id))
                 .findFirst();
     }
 

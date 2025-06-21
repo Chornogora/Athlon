@@ -1,7 +1,7 @@
 package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
-import com.bulhakov.repository.interfaces.FileRepository;
+import com.bulhakov.services.FileService;
 import com.bulhakov.util.LocalizationManager;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +25,12 @@ public class FileUploadCommand extends AbstractCommand {
 
     public static final String COMMAND_NAME = "/upload";
 
-    private final FileRepository fileRepository;
+    private final FileService fileService;
 
     @Autowired
-    public FileUploadCommand(LocalizationManager localizationManager, FileRepository fileRepository) {
+    public FileUploadCommand(LocalizationManager localizationManager, FileService fileService) {
         super(localizationManager);
-        this.fileRepository = fileRepository;
+        this.fileService = fileService;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class FileUploadCommand extends AbstractCommand {
                 execute(bot, sendMessage);
                 return;
             }
-            fileRepository.storeFile(telegramUserId, filenameGenerationResult.getLeft(), fileId);
+            fileService.storeFile(telegramUserId, filenameGenerationResult.getLeft(), fileId);
 
             String successText = getFileUploadedText(filenameGenerationResult.getLeft(), filenameGenerationResult.getRight());
             SendMessage sendMessage = getAnswer(message, successText);
@@ -69,7 +69,7 @@ public class FileUploadCommand extends AbstractCommand {
     private Pair<String, Boolean> getFileName(Message message, Long telegramUserId) {
         String messageContent = message.getCaption().substring(COMMAND_NAME.length()).stripLeading();
         if (!messageContent.isEmpty()) {
-            if (fileRepository.getFileForUser(telegramUserId, messageContent).isPresent()) {
+            if (fileService.getFileForUser(telegramUserId, messageContent).isPresent()) {
                 throw new IllegalArgumentException(localizationManager.getStringFromResource("FILE_NAME_EXISTS"));
             }
             return Pair.of(messageContent, true);
@@ -80,7 +80,7 @@ public class FileUploadCommand extends AbstractCommand {
         while (generatedId == null) {
             String randomId = UUID.randomUUID().toString();
             String randomIdShort = randomId.substring(0, randomId.indexOf("-"));
-            if (fileRepository.getFileForUser(telegramUserId, randomIdShort).isEmpty()) {
+            if (fileService.getFileForUser(telegramUserId, randomIdShort).isEmpty()) {
                 generatedId = randomIdShort;
             }
         }

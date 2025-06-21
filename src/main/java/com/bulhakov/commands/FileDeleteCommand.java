@@ -1,7 +1,7 @@
 package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
-import com.bulhakov.repository.interfaces.FileRepository;
+import com.bulhakov.services.FileService;
 import com.bulhakov.util.LocalizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,12 +20,12 @@ public class FileDeleteCommand extends AbstractCommand {
 
     public static final String COMMAND_NAME = "/delete";
 
-    private final FileRepository fileRepository;
+    private final FileService fileService;
 
     @Autowired
-    public FileDeleteCommand(LocalizationManager localizationManager, FileRepository fileRepository) {
+    public FileDeleteCommand(LocalizationManager localizationManager, FileService fileService) {
         super(localizationManager);
-        this.fileRepository = fileRepository;
+        this.fileService = fileService;
     }
 
     @Override
@@ -44,9 +44,9 @@ public class FileDeleteCommand extends AbstractCommand {
 
         Long telegramUserId = message.getFrom().getId();
 
-        Optional<String> file = fileRepository.getFileForUser(telegramUserId, filename);
+        Optional<String> file = fileService.getFileForUser(telegramUserId, filename);
         file.ifPresentOrElse(existingFileName -> {
-            fileRepository.deleteFile(telegramUserId, filename);
+            fileService.deleteFile(telegramUserId, filename);
             String successText = localizationManager.getStringFromResource("FILE_DELETE_SUCCESS");
             SendMessage sendMessage = getAnswer(message, successText);
             execute(bot, sendMessage);

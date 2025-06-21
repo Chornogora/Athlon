@@ -21,7 +21,7 @@ public class TelegramRequestAuthenticationFilter extends AbstractTelegramRequest
             System.out.println("User not found for ID: " + telegramUserId);
             saveNewUser(telegramUser);
             return;
-        } else if (!telegramUser.getUserName().equals(user.username())) {
+        } else if (!telegramUser.getUserName().equals(user.getUsername())) {
             updateUsername(telegramUser, user);
         }
 
@@ -31,9 +31,9 @@ public class TelegramRequestAuthenticationFilter extends AbstractTelegramRequest
     }
 
     private void updateUsername(org.telegram.telegrambots.meta.api.objects.User telegramUser, User user) {
-        User updatedUser = new User(user.id(), user.externalId(), user.login(), telegramUser.getUserName(), null, user.banned());
+        User updatedUser = new User(user.getId(), user.getExternalId(), user.getLogin(), telegramUser.getUserName(), null, user.getBanned());
         userService.updateUser(updatedUser);
-        System.out.println("Updated username for user: " + user.id());
+        System.out.println("Updated username for user: " + user.getId());
     }
 
     private void saveNewUser(org.telegram.telegrambots.meta.api.objects.User telegramUser) {

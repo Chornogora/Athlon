@@ -1,7 +1,7 @@
 package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
-import com.bulhakov.repository.interfaces.FileRepository;
+import com.bulhakov.services.FileService;
 import com.bulhakov.util.LocalizationManager;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,12 @@ public class FileRenameCommand extends AbstractCommand {
 
     public static final String COMMAND_NAME = "/rename";
 
-    private final FileRepository fileRepository;
+    private final FileService fileService;
 
     @Autowired
-    public FileRenameCommand(LocalizationManager localizationManager, FileRepository fileRepository) {
+    public FileRenameCommand(LocalizationManager localizationManager, FileService fileService) {
         super(localizationManager);
-        this.fileRepository = fileRepository;
+        this.fileService = fileService;
     }
 
     @Override
@@ -50,10 +50,10 @@ public class FileRenameCommand extends AbstractCommand {
     }
 
     private void tryRenameFile(TelegramLongPollingBot bot, Long telegramUserId, Pair<String, String> filenames, Message message) {
-        Optional<String> file = fileRepository.getFileForUser(telegramUserId, filenames.getLeft());
+        Optional<String> file = fileService.getFileForUser(telegramUserId, filenames.getLeft());
         file.ifPresentOrElse(existingFileName -> {
 
-            if (fileRepository.getFileForUser(telegramUserId, filenames.getRight()).isPresent()) {
+            if (fileService.getFileForUser(telegramUserId, filenames.getRight()).isPresent()) {
                 String errorText = localizationManager.getStringFromResource("FILE_RENAME_ALREADY_EXISTS")
                         + ": " + filenames.getRight();
                 SendMessage sendMessage = getAnswer(message, errorText);
@@ -61,7 +61,7 @@ public class FileRenameCommand extends AbstractCommand {
                 return;
             }
 
-            fileRepository.renameFile(telegramUserId, filenames.getLeft(), filenames.getRight());
+            fileService.renameFile(telegramUserId, filenames.getLeft(), filenames.getRight());
             String successText = localizationManager.getStringFromResource("FILE_RENAME_SUCCESS");
             SendMessage sendMessage = getAnswer(message, successText);
             execute(bot, sendMessage);

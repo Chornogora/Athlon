@@ -29,7 +29,7 @@ public class TelegramRequestAuthorizationFilter extends AbstractTelegramRequestF
         Long telegramUserId = telegramUser.getId();
         User user = userService.findUserByExternalId(telegramUserId);
 
-        if (user.banned()) {
+        if (user.getBanned()) {
             try {
                 String bannedMessage = localizationManager.getStringFromResource("USER_BANNED");
                 SendMessage sendMessage = TelegramUtil.getAnswer(update.getMessage(), bannedMessage);
