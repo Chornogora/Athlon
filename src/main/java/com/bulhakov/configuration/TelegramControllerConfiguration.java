@@ -2,8 +2,9 @@ package com.bulhakov.configuration;
 
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.commands.Command;
-import com.bulhakov.controller.telegram.InlineQueryHandler;
 import com.bulhakov.controller.telegram.AthlonBot;
+import com.bulhakov.controller.telegram.InlineQueryHandler;
+import com.bulhakov.filters.TelegramRequestFilterChain;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,9 +40,10 @@ public class TelegramControllerConfiguration {
 
     @Bean
     public AthlonBot telegramController(InlineQueryHandler inlineQueryHandler,
+                                        TelegramRequestFilterChain filterChain,
                                         @Qualifier("commandsByTelegramBotCommand")
-                                                 Map<String, Command> commandsMap) {
-        AthlonBot bot = new AthlonBot(botToken, botName, inlineQueryHandler);
+                                        Map<String, Command> commandsMap) {
+        AthlonBot bot = new AthlonBot(botToken, botName, filterChain, inlineQueryHandler);
         bot.setCommandMap(commandsMap);
 
         try {

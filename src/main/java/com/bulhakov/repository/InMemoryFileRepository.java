@@ -42,7 +42,7 @@ public class InMemoryFileRepository implements FileRepository {
                 String fileId = userFiles.remove(existingFileName);
                 userFiles.put(filename, fileId);
             } else {
-                throw new IllegalArgumentException("File with name " + existingFileName + " does not exist for user with id: " + telegramUserId);
+                throw new IllegalArgumentException("File with username " + existingFileName + " does not exist for user with id: " + telegramUserId);
             }
         } else {
             throw new IllegalArgumentException("No files found for user with id: " + telegramUserId);
@@ -56,7 +56,7 @@ public class InMemoryFileRepository implements FileRepository {
             if (userFiles.containsKey(filename)) {
                 userFiles.remove(filename);
             } else {
-                throw new IllegalArgumentException("File with name " + filename + " does not exist for user with id: " + telegramUserId);
+                throw new IllegalArgumentException("File with username " + filename + " does not exist for user with id: " + telegramUserId);
             }
         } else {
             throw new IllegalArgumentException("No files found for user with id: " + telegramUserId);

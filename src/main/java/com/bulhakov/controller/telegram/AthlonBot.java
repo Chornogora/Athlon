@@ -1,6 +1,7 @@
 package com.bulhakov.controller.telegram;
 
 import com.bulhakov.commands.Command;
+import com.bulhakov.filters.TelegramRequestFilterChain;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -14,33 +15,40 @@ import java.util.regex.Pattern;
 
 public class AthlonBot extends TelegramLongPollingBot {
 
-    private Map<String, Command> commandMap;
+    private final TelegramRequestFilterChain telegramRequestFilterChain;
 
     private final String botName;
 
     private final InlineQueryHandler inlineQueryHandler;
 
-    public AthlonBot(String botToken, String botName, InlineQueryHandler inlineQueryHandler) {
+    private Map<String, Command> commandMap;
+
+    public AthlonBot(String botToken, String botName,
+                     TelegramRequestFilterChain filterChain, InlineQueryHandler inlineQueryHandler) {
         super(botToken);
         this.botName = botName;
+        this.telegramRequestFilterChain = filterChain;
         this.inlineQueryHandler = inlineQueryHandler;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        try {
-            if (update.hasMessage()) {
-                System.out.println("Handling message update");
-                handleMessage(update);
-            } else if (update.hasInlineQuery()) {
-                System.out.println("Handling inline query update");
-                AnswerInlineQuery answer = inlineQueryHandler.handleInlineQuery(update.getInlineQuery());
-                execute(answer);
-            }
-        } catch (TelegramApiException e) {
-            System.err.println("Error processing update: " + e.getMessage());
-            e.printStackTrace();
-        }
+        telegramRequestFilterChain.afterFiltering(telegramUpdate -> {
+                    try {
+                        if (telegramUpdate.hasMessage()) {
+                            System.out.println("Handling message update");
+                            handleMessage(telegramUpdate);
+                        } else if (telegramUpdate.hasInlineQuery()) {
+                            System.out.println("Handling inline query update");
+                            AnswerInlineQuery answer = inlineQueryHandler.handleInlineQuery(telegramUpdate.getInlineQuery());
+                            execute(answer);
+                        }
+                    } catch (TelegramApiException e) {
+                        System.err.println("Error processing update: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                })
+                .processRequest(update);
     }
 
     private void handleMessage(Update update) {

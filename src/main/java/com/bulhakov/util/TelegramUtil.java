@@ -1,0 +1,16 @@
+package com.bulhakov.util;
+
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+
+public class TelegramUtil {
+
+    public static SendMessage getAnswer(Message message, String answerText) {
+        SendMessage s = new SendMessage();
+        s.enableHtml(true);
+        s.setChatId(message.getChatId().toString());
+        s.setReplyToMessageId(message.getMessageId());
+        s.setText(answerText);
+        return s;
+    }
+}

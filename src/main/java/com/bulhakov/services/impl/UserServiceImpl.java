@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserServiceImpl(UserRepository userRepository){
+    private UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public void deleteUser(User user) {
-        userRepository.delete(user);
+        userRepository.delete(user.id());
     }
 
     @Override
@@ -34,6 +34,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUser(String id) {
         return userRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public User findUserByExternalId(Long externalId) {
+        return userRepository.findByExternalId(externalId).orElse(null);
     }
 
     @Override

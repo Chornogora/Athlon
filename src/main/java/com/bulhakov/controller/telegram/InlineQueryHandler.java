@@ -35,7 +35,7 @@ public class InlineQueryHandler {
             voiceResult.setTitle(phrase);
             voiceResult.setVoiceUrl(phrases.get(phrase)); // This must be a direct URL to the voice file
             // You might also want to set an inputMessageContent if clicking the voice should send a text message
-            // voiceResult.setInputMessageContent(new InputTextMessageContent("Playing " + phrase.get("name")));
+            // voiceResult.setInputMessageContent(new InputTextMessageContent("Playing " + phrase.get("username")));
             results.add(voiceResult);
         }
 

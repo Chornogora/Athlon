@@ -21,6 +21,8 @@ public class SetBirthdayCommand extends AbstractCommand {
 
     private static final String DATE_STRING_FORMAT = "dd.mm.yyyy";
 
+    private final UserService userService;
+
     private final SimpleDateFormat dateFormat;
     private final LocalizationManager localizationManager;
 
@@ -57,8 +59,10 @@ public class SetBirthdayCommand extends AbstractCommand {
         }
 
         try {
-            user.setBirthday(getBirthdayDate(dateString));
-            userService.updateUser(user);
+            Date birthday = getBirthdayDate(dateString);
+            User updatedUser = new User(user.id(), user.externalId(), user.login(), user.username(),
+                    birthday, user.banned());
+            userService.updateUser(updatedUser);
             answer = getAnswer(update.getMessage(),
                     localizationManager.getStringFromResource("BIRTHDAY_ACCEPTED"));
             execute(bot, answer);

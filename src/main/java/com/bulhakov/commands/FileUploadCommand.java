@@ -75,7 +75,7 @@ public class FileUploadCommand extends AbstractCommand {
             return Pair.of(messageContent, true);
         }
 
-        // Generate a unique file name based on a random UUID
+        // Generate a unique file username based on a random UUID
         String generatedId = null;
         while (generatedId == null) {
             String randomId = UUID.randomUUID().toString();
@@ -90,8 +90,8 @@ public class FileUploadCommand extends AbstractCommand {
     private String getFileUploadedText(String fileName, boolean isCustomName) {
         String basicMessage = localizationManager.getStringFromResource("FILE_UPLOAD_SUCCESS");
         return (isCustomName)
-                ? "%s. File name: %s".formatted(basicMessage, fileName)
-                : "%s. File name: %s. You can change it using the /rename command".formatted(basicMessage, fileName);
+                ? "%s. File username: %s".formatted(basicMessage, fileName)
+                : "%s. File username: %s. You can change it using the /rename command".formatted(basicMessage, fileName);
     }
 
     private Optional<String> tryExtractingFileId(Message message) {

@@ -20,7 +20,7 @@ public class AthlonBotTest {
 
     @Before
     public void setUp() {
-        controller = new AthlonBot("test", "test", null);
+        controller = new AthlonBot("test", "test", null, null);
     }
 
     @Test

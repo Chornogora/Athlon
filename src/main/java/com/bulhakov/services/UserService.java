@@ -12,5 +12,7 @@ public interface UserService {
 
     User findUser(String id);
 
+    User findUserByExternalId(Long id);
+
     Iterable<User> findAll();
 }
