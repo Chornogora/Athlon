@@ -1,3 +1,4 @@
 hello - Say hello to Athlon
 upload - Upload an audio file
 rename - Rename uploaded file
+delete - Delete uploaded file

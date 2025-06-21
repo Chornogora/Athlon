@@ -25,7 +25,7 @@ public class TelegramRequestAuthorizationFilter extends AbstractTelegramRequestF
 
     @Override
     public void processRequest(Update update) {
-        org.telegram.telegrambots.meta.api.objects.User telegramUser = update.getMessage().getFrom();
+        org.telegram.telegrambots.meta.api.objects.User telegramUser = TelegramUtil.getUser(update);
         Long telegramUserId = telegramUser.getId();
         User user = userService.findUserByExternalId(telegramUserId);
 

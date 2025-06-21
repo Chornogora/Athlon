@@ -2,6 +2,7 @@ package com.bulhakov.filters;
 
 import com.bulhakov.model.User;
 import com.bulhakov.services.UserService;
+import com.bulhakov.util.TelegramUtil;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class TelegramRequestAuthenticationFilter extends AbstractTelegramRequestFilter {
@@ -14,7 +15,7 @@ public class TelegramRequestAuthenticationFilter extends AbstractTelegramRequest
 
     @Override
     public void processRequest(Update update) {
-        org.telegram.telegrambots.meta.api.objects.User telegramUser = update.getMessage().getFrom();
+        org.telegram.telegrambots.meta.api.objects.User telegramUser = TelegramUtil.getUser(update);
         Long telegramUserId = telegramUser.getId();
         User user = userService.findUserByExternalId(telegramUserId);
         if (user == null) {

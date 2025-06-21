@@ -1,6 +1,8 @@
 package com.bulhakov.controller.telegram;
 
-import com.bulhakov.repository.interfaces.FileRepository;
+import com.bulhakov.model.User;
+import com.bulhakov.services.FileService;
+import com.bulhakov.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
@@ -16,24 +18,27 @@ import java.util.UUID;
 @Component
 public class InlineQueryHandler {
 
-    private final FileRepository fileRepository;
+    private final UserService userService;
+    private final FileService fileService;
 
     @Autowired
-    public InlineQueryHandler(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
+    public InlineQueryHandler(UserService userService, FileService fileService) {
+        this.userService = userService;
+        this.fileService = fileService;
     }
 
     public AnswerInlineQuery handleInlineQuery(InlineQuery inlineQuery) {
         List<InlineQueryResult> results = new ArrayList<>();
 
         Long telegramUserId = inlineQuery.getFrom().getId();
-        Map<String, String> phrases = fileRepository.getFilesForUser(telegramUserId);
+        User user = userService.findUserByExternalId(telegramUserId);
+        Map<String, String> fileNamesToExternalFileIds = fileService.getFilesForUser(user.getId());
 
-        for (String phrase : phrases.keySet()) {
+        for (String phrase : fileNamesToExternalFileIds.keySet()) {
             InlineQueryResultVoice voiceResult = new InlineQueryResultVoice();
             voiceResult.setId(UUID.randomUUID().toString()); // Generate a unique ID for each result
             voiceResult.setTitle(phrase);
-            voiceResult.setVoiceUrl(phrases.get(phrase)); // This must be a direct URL to the voice file
+            voiceResult.setVoiceUrl(fileNamesToExternalFileIds.get(phrase)); // This must be a direct URL to the voice file
             // You might also want to set an inputMessageContent if clicking the voice should send a text message
             // voiceResult.setInputMessageContent(new InputTextMessageContent("Playing " + phrase.get("username")));
             results.add(voiceResult);

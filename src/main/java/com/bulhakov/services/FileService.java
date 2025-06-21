@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -61,6 +64,14 @@ public class FileService {
             );
             return fileRepository.save(newFile);
         }
+    }
+
+    public Map<String, String> getFilesForUser(String userId) {
+        List<File> files = fileRepository.findByUserId(userId);
+
+        // Transform List<File> into Map<filename, externalFileId> as in your old repository
+        return files.stream()
+                .collect(Collectors.toMap(File::getFileName, File::getExternalFileId));
     }
 
     public Optional<String> getFileForUser(Long externalUserId, String filename) {
