@@ -1,4 +1,14 @@
 services:
+  athlon-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: athlon-app:dc
+    ports:
+      - 5000:5000
+    depends_on:
+      - athlon-db
+    env_file: .env
   athlon-db:
     image: postgres
     restart: always

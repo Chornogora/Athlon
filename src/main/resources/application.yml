@@ -3,13 +3,13 @@ server:
 
 telegram-bot:
     bot-name: 'Athlon'
-    bot-token: '<push your bot token here>'
+    bot-token: ${ATHLON_BOT_TOKEN}
 
 spring:
     datasource:
-        url: jdbc:postgresql://localhost:5432/athlon
-        username: athlon
-        password: athlon_pass
+        url: ${SPRING_DATASOURCE_URL}
+        username: ${SPRING_DATASOURCE_USERNAME}
+        password: ${SPRING_DATASOURCE_PASSWORD}
     liquibase:
         change-log: classpath:db/changelog/db.changelog-master.yml
         enabled: true

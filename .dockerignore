@@ -1,0 +1,11 @@
+.mvn/
+.idea/
+.settings/
+.vscode/
+target/
+build/
+*.iml
+*.bak
+*.log
+*.md
+Dockerfile

@@ -17,4 +17,4 @@ target/
 
 # Project
 src/main/resources/secret.txt
-src/main/resources/application-prod.yml
+.env
