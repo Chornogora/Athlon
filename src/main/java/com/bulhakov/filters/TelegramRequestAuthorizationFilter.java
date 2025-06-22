@@ -4,11 +4,13 @@ import com.bulhakov.model.User;
 import com.bulhakov.services.UserService;
 import com.bulhakov.util.LocalizationManager;
 import com.bulhakov.util.TelegramUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Slf4j
 public class TelegramRequestAuthorizationFilter extends AbstractTelegramRequestFilter {
 
     private final TelegramLongPollingBot bot;
@@ -36,7 +38,7 @@ public class TelegramRequestAuthorizationFilter extends AbstractTelegramRequestF
                 bot.execute(sendMessage);
                 return;
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                log.error("Failed to send message", e);
                 return;
             }
         }

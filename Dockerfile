@@ -41,4 +41,4 @@ EXPOSE 5000
 # Use 'java -jar' to execute the Spring Boot fat JAR.
 # The '-Duser.timezone=UTC' ensures consistent timezone handling.
 # The '-XX:InitialRAMPercentage', '-XX:MaxRAMPercentage' are good practices for memory management in containers.
-ENTRYPOINT ["java", "-Duser.timezone=UTC", "-XX:InitialRAMPercentage=70", "-XX:MaxRAMPercentage=70", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=UTC", "-XX:MaxMetaspaceSize=256m", "-Xmx512m", "-jar", "app.jar"]

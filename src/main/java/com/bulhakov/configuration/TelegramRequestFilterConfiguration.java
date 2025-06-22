@@ -10,6 +10,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 public class TelegramRequestFilterConfiguration {
@@ -38,6 +40,7 @@ public class TelegramRequestFilterConfiguration {
         return authenticationFilter;
     }
 
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     @EventListener(ApplicationReadyEvent.class)
     public void setupFilterChain() {
         telegramRequestFilterChain.addFilter(authenticationFilter)

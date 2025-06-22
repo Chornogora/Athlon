@@ -7,8 +7,10 @@ import com.bulhakov.controller.telegram.InlineQueryHandler;
 import com.bulhakov.filters.TelegramRequestFilterChain;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -25,6 +27,8 @@ public class TelegramControllerConfiguration {
 
     @Value("${telegram-bot.bot-token}")
     private String botToken;
+
+    private AthlonBot bot;
 
     @Bean
     @Qualifier("commandsByTelegramBotCommand")
@@ -45,16 +49,18 @@ public class TelegramControllerConfiguration {
                                         Map<String, Command> commandsMap) {
         AthlonBot bot = new AthlonBot(botToken, botName, filterChain, inlineQueryHandler);
         bot.setCommandMap(commandsMap);
+        this.bot = bot;
+        return bot;
+    }
 
+    @EventListener(ApplicationReadyEvent.class)
+    public void registerTelegramBot() {
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(bot);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
             throw new RuntimeException("Failed to register Telegram bot", e);
         }
-
-        return bot;
     }
 
     private String getCommandStringRepresentation(Command command) {
@@ -62,4 +68,5 @@ public class TelegramControllerConfiguration {
         CommandMapping annotation = cls.getAnnotation(CommandMapping.class);
         return annotation.name();
     }
+
 }
