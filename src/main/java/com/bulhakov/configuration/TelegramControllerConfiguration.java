@@ -2,6 +2,7 @@ package com.bulhakov.configuration;
 
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.commands.Command;
+import com.bulhakov.commands.FileUploadSilentCommand;
 import com.bulhakov.controller.telegram.AthlonBot;
 import com.bulhakov.controller.telegram.InlineQueryHandler;
 import com.bulhakov.filters.TelegramRequestFilterChain;
@@ -46,8 +47,9 @@ public class TelegramControllerConfiguration {
     public AthlonBot telegramController(InlineQueryHandler inlineQueryHandler,
                                         TelegramRequestFilterChain filterChain,
                                         @Qualifier("commandsByTelegramBotCommand")
-                                        Map<String, Command> commandsMap) {
-        AthlonBot bot = new AthlonBot(botToken, botName, filterChain, inlineQueryHandler);
+                                        Map<String, Command> commandsMap,
+                                        FileUploadSilentCommand fileUploadSilentCommand) {
+        AthlonBot bot = new AthlonBot(botToken, botName, filterChain, inlineQueryHandler, fileUploadSilentCommand);
         bot.setCommandMap(commandsMap);
         this.bot = bot;
         return bot;

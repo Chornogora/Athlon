@@ -1,9 +1,11 @@
 package com.bulhakov.controller.telegram;
 
 import com.bulhakov.commands.Command;
+import com.bulhakov.commands.FileUploadSilentCommand;
 import com.bulhakov.filters.TelegramRequestFilterChain;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -24,28 +26,36 @@ public class AthlonBot extends TelegramLongPollingBot {
 
     private final InlineQueryHandler inlineQueryHandler;
 
+    private final FileUploadSilentCommand fileUploadSilentCommand;
+
     @Setter
     private Map<String, Command> commandMap;
 
     public AthlonBot(String botToken, String botName,
-                     TelegramRequestFilterChain filterChain, InlineQueryHandler inlineQueryHandler) {
+                     TelegramRequestFilterChain filterChain,
+                     InlineQueryHandler inlineQueryHandler,
+                     FileUploadSilentCommand fileUploadSilentCommand) {
         super(botToken);
         this.botName = botName;
         this.telegramRequestFilterChain = filterChain;
         this.inlineQueryHandler = inlineQueryHandler;
+        this.fileUploadSilentCommand = fileUploadSilentCommand;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
         telegramRequestFilterChain.afterFiltering(telegramUpdate -> {
                     try {
-                        if (telegramUpdate.hasMessage()) {
+                        if (telegramUpdate.hasMessage() && StringUtils.isNotEmpty(telegramUpdate.getMessage().getText())) {
                             log.info("Handling message update");
                             handleMessage(telegramUpdate);
                         } else if (telegramUpdate.hasInlineQuery()) {
                             log.info("Handling inline query update");
                             AnswerInlineQuery answer = inlineQueryHandler.handleInlineQuery(telegramUpdate.getInlineQuery());
                             execute(answer);
+                        } else {
+                            log.info("Handling silent update");
+                            fileUploadSilentCommand.processUpdate(telegramUpdate, this);
                         }
                     } catch (TelegramApiException e) {
                         log.error("Error processing update", e);

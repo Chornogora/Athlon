@@ -2,7 +2,7 @@ server:
     port: 5000
 
 telegram-bot:
-    bot-name: 'Athlon'
+    bot-name: 'Athlon_Alpha_Bot'
     bot-token: ${ATHLON_BOT_TOKEN}
 
 spring:

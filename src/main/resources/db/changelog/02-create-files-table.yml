@@ -30,7 +30,7 @@ databaseChangeLog:
                   type: VARCHAR(255 CHAR)
                   constraints:
                     nullable: false
-                    unique: true
+                    unique: false
               - column:
                   name: upload_date
                   type: TIMESTAMP WITH TIME ZONE
