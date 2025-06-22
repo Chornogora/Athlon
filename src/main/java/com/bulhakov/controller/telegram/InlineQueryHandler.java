@@ -1,5 +1,6 @@
 package com.bulhakov.controller.telegram;
 
+import com.bulhakov.model.File;
 import com.bulhakov.model.User;
 import com.bulhakov.services.FileService;
 import com.bulhakov.services.UserService;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class InlineQueryHandler {
@@ -32,15 +34,17 @@ public class InlineQueryHandler {
 
         Long telegramUserId = inlineQuery.getFrom().getId();
         User user = userService.findUserByExternalId(telegramUserId);
-        Map<String, String> fileNamesToExternalFileIds = fileService.getFilesForUser(user.getId());
+        List<File> userFiles = fileService.getFilesForUser(user.getId());
+        Map<String, String> fileNamesToExternalFileIds = userFiles.stream()
+                .collect(Collectors.toMap(File::getFileName, File::getExternalFileId));
 
-        for (String phrase : fileNamesToExternalFileIds.keySet()) {
+        for (String fileName : fileNamesToExternalFileIds.keySet()) {
             InlineQueryResultVoice voiceResult = new InlineQueryResultVoice();
             voiceResult.setId(UUID.randomUUID().toString()); // Generate a unique ID for each result
-            voiceResult.setTitle(phrase);
-            voiceResult.setVoiceUrl(fileNamesToExternalFileIds.get(phrase)); // This must be a direct URL to the voice file
+            voiceResult.setTitle(fileName);
+            voiceResult.setVoiceUrl(fileNamesToExternalFileIds.get(fileName)); // This must be a direct URL to the voice file
             // You might also want to set an inputMessageContent if clicking the voice should send a text message
-            // voiceResult.setInputMessageContent(new InputTextMessageContent("Playing " + phrase.get("username")));
+            // voiceResult.setInputMessageContent(new InputTextMessageContent("Playing " + fileName.get("username")));
             results.add(voiceResult);
         }
 

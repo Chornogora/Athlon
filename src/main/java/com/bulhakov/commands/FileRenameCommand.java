@@ -1,6 +1,7 @@
 package com.bulhakov.commands;
 
 import com.bulhakov.annotations.CommandMapping;
+import com.bulhakov.model.File;
 import com.bulhakov.services.FileService;
 import com.bulhakov.util.LocalizationManager;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,8 +51,8 @@ public class FileRenameCommand extends AbstractCommand {
     }
 
     private void tryRenameFile(TelegramLongPollingBot bot, Long telegramUserId, Pair<String, String> filenames, Message message) {
-        Optional<String> file = fileService.getFileForUser(telegramUserId, filenames.getLeft());
-        file.ifPresentOrElse(existingFileName -> {
+        Optional<File> file = fileService.getFileForUser(telegramUserId, filenames.getLeft());
+        file.ifPresentOrElse(existingFile -> {
 
             if (fileService.getFileForUser(telegramUserId, filenames.getRight()).isPresent()) {
                 String errorText = localizationManager.getStringFromResource("FILE_RENAME_ALREADY_EXISTS")
