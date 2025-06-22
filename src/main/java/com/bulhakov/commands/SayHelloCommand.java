@@ -23,7 +23,7 @@ public class SayHelloCommand extends AbstractCommand {
     public void processUpdate(Update update, TelegramLongPollingBot bot) {
         Message message = update.getMessage();
         User contact = message.getFrom();
-        String answerText = localizationManager.getStringFromResource("HELLO") + ", " + contact.getUserName() + "!";
+        String answerText = localizationManager.getStringFromResource("HELLO") + ", @" + contact.getUserName() + "!";
         SendMessage sendMessage = getAnswer(message, answerText);
         execute(bot, sendMessage);
     }

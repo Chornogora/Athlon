@@ -3,6 +3,7 @@ package com.bulhakov.commands;
 import com.bulhakov.annotations.CommandMapping;
 import com.bulhakov.services.FileService;
 import com.bulhakov.util.LocalizationManager;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 import static com.bulhakov.commands.FileUploadCommand.COMMAND_NAME;
 
+@Slf4j
 @Component
 @CommandMapping(name = COMMAND_NAME)
 public class FileUploadCommand extends AbstractCommand {
@@ -114,7 +116,7 @@ public class FileUploadCommand extends AbstractCommand {
 
             // Proceed to download the file using the filePath
             java.io.File downloaded = bot.downloadFile(filePath);
-            System.out.println(downloaded.getAbsolutePath());
+            log.info(downloaded.getAbsolutePath());
         } catch (TelegramApiException e) {
             e.printStackTrace();
             String errorText = localizationManager.getStringFromResource("FILE_UPLOAD_ERROR");

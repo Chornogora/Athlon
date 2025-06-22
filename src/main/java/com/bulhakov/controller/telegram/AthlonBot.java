@@ -2,6 +2,8 @@ package com.bulhakov.controller.telegram;
 
 import com.bulhakov.commands.Command;
 import com.bulhakov.filters.TelegramRequestFilterChain;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class AthlonBot extends TelegramLongPollingBot {
 
     private final TelegramRequestFilterChain telegramRequestFilterChain;
@@ -21,6 +24,7 @@ public class AthlonBot extends TelegramLongPollingBot {
 
     private final InlineQueryHandler inlineQueryHandler;
 
+    @Setter
     private Map<String, Command> commandMap;
 
     public AthlonBot(String botToken, String botName,
@@ -36,16 +40,15 @@ public class AthlonBot extends TelegramLongPollingBot {
         telegramRequestFilterChain.afterFiltering(telegramUpdate -> {
                     try {
                         if (telegramUpdate.hasMessage()) {
-                            System.out.println("Handling message update");
+                            log.info("Handling message update");
                             handleMessage(telegramUpdate);
                         } else if (telegramUpdate.hasInlineQuery()) {
-                            System.out.println("Handling inline query update");
+                            log.info("Handling inline query update");
                             AnswerInlineQuery answer = inlineQueryHandler.handleInlineQuery(telegramUpdate.getInlineQuery());
                             execute(answer);
                         }
                     } catch (TelegramApiException e) {
-                        System.err.println("Error processing update: " + e.getMessage());
-                        e.printStackTrace();
+                        log.error("Error processing update", e);
                     }
                 })
                 .processRequest(update);
@@ -58,22 +61,18 @@ public class AthlonBot extends TelegramLongPollingBot {
                 : getCommandRepresentation(messageText);
 
         if (commandRepresentation == null) {
-            System.out.println("No command found in the message");
+            log.info("No command found in the message");
             return;
         }
 
         Command command = commandMap.get(commandRepresentation);
         Optional.ofNullable(command).ifPresentOrElse(cmd -> cmd.processUpdate(update, this),
-                () -> System.out.println("Command not found: " + commandRepresentation));
+                () -> log.info("Command not found: {}", commandRepresentation));
     }
 
     @Override
     public String getBotUsername() {
         return botName;
-    }
-
-    public void setCommandMap(Map<String, Command> map) {
-        this.commandMap = map;
     }
 
     private String getCaptionOrNull(Message message) {
