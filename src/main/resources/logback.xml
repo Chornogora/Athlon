@@ -11,8 +11,4 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="com.example.myapp.MyClass" level="debug" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
 </configuration>
