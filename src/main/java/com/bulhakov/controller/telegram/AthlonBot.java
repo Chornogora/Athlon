@@ -46,7 +46,7 @@ public class AthlonBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         telegramRequestFilterChain.afterFiltering(telegramUpdate -> {
                     try {
-                        if (hasTextOrCaption(telegramUpdate)) {
+                        if (hasCommandTextOrCaption(telegramUpdate)) {
                             log.info("Handling message update");
                             handleMessage(telegramUpdate);
                         } else if (telegramUpdate.hasInlineQuery()) {
@@ -64,10 +64,17 @@ public class AthlonBot extends TelegramLongPollingBot {
                 .processRequest(update);
     }
 
-    private static boolean hasTextOrCaption(Update telegramUpdate) {
-        return telegramUpdate.hasMessage() &&
-                (StringUtils.isNotEmpty(telegramUpdate.getMessage().getText())
-                        || StringUtils.isNotEmpty(telegramUpdate.getMessage().getCaption()));
+    private static boolean hasCommandTextOrCaption(Update telegramUpdate) {
+        if (telegramUpdate.hasMessage()) {
+            String messageText = telegramUpdate.getMessage().getText();
+            if (messageText != null && messageText.startsWith("/")) {
+                return true;
+            }
+
+            String messageCaption = telegramUpdate.getMessage().getCaption();
+            return StringUtils.isNotEmpty(messageCaption) && messageCaption.startsWith("/");
+        }
+        return false;
     }
 
     private void handleMessage(Update update) {

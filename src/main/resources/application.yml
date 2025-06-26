@@ -1,10 +1,6 @@
 server:
     port: 5000
 
-telegram-bot:
-    bot-name: 'Athlon_Alpha_Bot'
-    bot-token: ${ATHLON_BOT_TOKEN}
-
 spring:
     datasource:
         url: ${SPRING_DATASOURCE_URL}
@@ -13,3 +9,11 @@ spring:
     liquibase:
         change-log: classpath:db/changelog/db.changelog-master.yml
         enabled: true
+
+telegram-bot:
+    bot-name: ${ATHLON_BOT_NAME}
+    bot-token: ${ATHLON_BOT_TOKEN}
+
+athlon-setup:
+    temporary-file-download-directory: '/temp/input'
+    temporary-file-convertion-directory: '/temp/output'
