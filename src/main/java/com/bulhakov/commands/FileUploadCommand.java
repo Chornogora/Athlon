@@ -4,6 +4,7 @@ import com.bulhakov.exceptions.MediaProcessingException;
 import com.bulhakov.services.FileService;
 import com.bulhakov.services.FormatConvertionService;
 import com.bulhakov.util.LocalizationManager;
+import com.bulhakov.util.TelegramUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,9 @@ abstract class FileUploadCommand extends AbstractCommand {
 
     @Value("${athlon-setup.temporary-file-convertion-directory}")
     public String temporaryFileConvertionDirectory;
+
+    @Value("${athlon-setup.max-file-size-bytes:104857600}") // Default to 100 MB
+    public Long maxFileSizeBytes;
 
     protected final FormatConvertionService fileConvertionService;
     protected final FileService fileService;
@@ -71,6 +75,20 @@ abstract class FileUploadCommand extends AbstractCommand {
         execute(bot, sendMessage);
     }
 
+    protected String generateFileWithRandomName(Long telegramUserId) {
+        String generatedId = null;
+        while (generatedId == null) {
+            String randomId = UUID.randomUUID().toString();
+            String randomIdShort = randomId.substring(0, randomId.indexOf("-"));
+            if (fileService.getFileForUser(telegramUserId, randomIdShort).isEmpty()) {
+                generatedId = randomIdShort;
+            }
+        }
+        return generatedId;
+    }
+
+    abstract UploadedFileName getFileName(Message message, TelegramLongPollingBot bot);
+
     private boolean ofCorrectType(Message message) {
         return message != null && (message.hasVoice()
                 || message.hasAudio()
@@ -99,8 +117,9 @@ abstract class FileUploadCommand extends AbstractCommand {
                 fileService.storeFile(telegramUserId, filename, voiceFileId);
             }
         } catch (TelegramApiException e) {
-            log.error("Failed to upload voice file", e);
-            throw new MediaProcessingException("Failed to upload voice file", e);
+            log.error("Failed to upload media file", e);
+            notifyUserAboutFailedDownload(message, bot);
+            throw new RuntimeException("Failed to upload media file", e);
         } finally {
             tryDeleteFile(outputFile);
             tryDeleteFile(oggFile);
@@ -108,18 +127,31 @@ abstract class FileUploadCommand extends AbstractCommand {
 
     }
 
-    private File tryDownloadFile(TelegramLongPollingBot bot, String fileId, File outputFile) {
+    private void notifyUserAboutFailedDownload(Message message, TelegramLongPollingBot bot) {
         try {
-            GetFile getFile = new GetFile();
-            getFile.setFileId(fileId);
-            org.telegram.telegrambots.meta.api.objects.File telegramFile = bot.execute(getFile);
-            String filePath = telegramFile.getFilePath(); // This is the path on Telegram's server
-
-            File downloaded = bot.downloadFile(filePath, outputFile);
-            log.info("File {} downloaded to {}", fileId, downloaded.getAbsolutePath());
-            return downloaded;
+            String failureMessageText = localizationManager.getStringFromResource("FILE_DOWNLOAD_FAILED");
+            SendMessage sendMessage = TelegramUtil.getAnswer(message, failureMessageText);
+            bot.execute(sendMessage);
         } catch (TelegramApiException e) {
-            throw new RuntimeException("Failed to download file from Telegram", e);
+            log.error("Failed to notify user about failed download", e);
+        }
+    }
+
+    private File tryDownloadFile(TelegramLongPollingBot bot, String fileId, File outputFile) throws TelegramApiException {
+        GetFile getFile = new GetFile();
+        getFile.setFileId(fileId);
+        org.telegram.telegrambots.meta.api.objects.File telegramFile = bot.execute(getFile);
+        throwMediaExceptionIfFileIsTooLarge(telegramFile);
+
+        String filePath = telegramFile.getFilePath(); // This is the path on Telegram's server
+        File downloaded = bot.downloadFile(filePath, outputFile);
+        log.info("File {} downloaded to {}", fileId, downloaded.getAbsolutePath());
+        return downloaded;
+    }
+
+    private void throwMediaExceptionIfFileIsTooLarge(org.telegram.telegrambots.meta.api.objects.File telegramFile) {
+        if (telegramFile.getFileSize() > maxFileSizeBytes) {
+            throw new MediaProcessingException("File size exceeds the maximum allowed limit of %d bytes".formatted(maxFileSizeBytes));
         }
     }
 
@@ -148,20 +180,6 @@ abstract class FileUploadCommand extends AbstractCommand {
             }
         }
     }
-
-    protected String generateFileWithRandomName(Long telegramUserId) {
-        String generatedId = null;
-        while (generatedId == null) {
-            String randomId = UUID.randomUUID().toString();
-            String randomIdShort = randomId.substring(0, randomId.indexOf("-"));
-            if (fileService.getFileForUser(telegramUserId, randomIdShort).isEmpty()) {
-                generatedId = randomIdShort;
-            }
-        }
-        return generatedId;
-    }
-
-    abstract UploadedFileName getFileName(Message message, TelegramLongPollingBot bot);
 
     private String getFileUploadedText(String fileName, boolean isCustomName) {
         String basicMessage = localizationManager.getStringFromResource("FILE_UPLOAD_SUCCESS");

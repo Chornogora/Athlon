@@ -17,3 +17,5 @@ telegram-bot:
 athlon-setup:
     temporary-file-download-directory: '/temp/input'
     temporary-file-convertion-directory: '/temp/output'
+    max-file-size-bytes: 104857600
+    pool-size: 2

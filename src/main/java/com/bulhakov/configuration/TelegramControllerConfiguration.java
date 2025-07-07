@@ -48,8 +48,11 @@ public class TelegramControllerConfiguration {
                                         TelegramRequestFilterChain filterChain,
                                         @Qualifier("commandsByTelegramBotCommand")
                                         Map<String, Command> commandsMap,
-                                        FileUploadSilentCommand fileUploadSilentCommand) {
+                                        FileUploadSilentCommand fileUploadSilentCommand,
+                                        @Value("${athlon-setup.pool-size}")
+                                        int poolSize) {
         AthlonBot bot = new AthlonBot(botToken, botName, filterChain, inlineQueryHandler, fileUploadSilentCommand);
+        bot.setupExecutor(poolSize);
         bot.setCommandMap(commandsMap);
         this.bot = bot;
         return bot;

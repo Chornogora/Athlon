@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +28,8 @@ public class AthlonBot extends TelegramLongPollingBot {
     private final InlineQueryHandler inlineQueryHandler;
 
     private final FileUploadSilentCommand fileUploadSilentCommand;
+
+    private ExecutorService executor;
 
     @Setter
     private Map<String, Command> commandMap;
@@ -42,9 +45,23 @@ public class AthlonBot extends TelegramLongPollingBot {
         this.fileUploadSilentCommand = fileUploadSilentCommand;
     }
 
+    public void setupExecutor(int poolSize) {
+        this.executor = java.util.concurrent.Executors.newFixedThreadPool(poolSize);
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
-        telegramRequestFilterChain.afterFiltering(telegramUpdate -> {
+        Runnable updateHandler = getUpdateHandler(update);
+        if (executor != null) {
+            executor.execute(updateHandler);
+        } else {
+            log.warn("Executor wasn't set up, processing update synchronously");
+            updateHandler.run();
+        }
+    }
+
+    public Runnable getUpdateHandler(Update update) {
+        return () -> telegramRequestFilterChain.afterFiltering(telegramUpdate -> {
                     try {
                         if (hasCommandTextOrCaption(telegramUpdate)) {
                             log.info("Handling message update");
@@ -64,7 +81,7 @@ public class AthlonBot extends TelegramLongPollingBot {
                 .processRequest(update);
     }
 
-    private static boolean hasCommandTextOrCaption(Update telegramUpdate) {
+    private boolean hasCommandTextOrCaption(Update telegramUpdate) {
         if (telegramUpdate.hasMessage()) {
             String messageText = telegramUpdate.getMessage().getText();
             if (messageText != null && messageText.startsWith("/")) {
