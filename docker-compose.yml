@@ -9,6 +9,9 @@ services:
     depends_on:
       - athlon-db
     env_file: .env
+    volumes:
+      # copy container path from the .env file
+      - /var/log/docker/athlon-telegram-bot:/var/log/athlon-telegram-bot
   athlon-db:
     image: postgres
     restart: always

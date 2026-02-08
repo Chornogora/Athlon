@@ -39,6 +39,10 @@ RUN mkdir /temp
 RUN mkdir /temp/input
 RUN mkdir /temp/output
 
+#create log directory and set permissions for it
+RUN mkdir -p /var/log/athlon-telegram-bot && \
+    chmod 777 /var/log/athlon-telegram-bot
+
 # Expose the port the Spring Boot application runs
 EXPOSE 5000
 
